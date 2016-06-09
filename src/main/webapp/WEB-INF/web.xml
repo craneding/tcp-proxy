@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+              http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+         version="2.5" xmlns="http://java.sun.com/xml/ns/javaee">
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+  </welcome-file-list>
+
+  <servlet>
+    <servlet-name>TcpRegister</servlet-name>
+    <servlet-class>com.dinghz.tcpproxy.http.TcpRegister</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>TcpRegister</servlet-name>
+    <url-pattern>/tcp/TcpRegister</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>TcpUnRegister</servlet-name>
+    <servlet-class>com.dinghz.tcpproxy.http.TcpUnRegister</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>TcpUnRegister</servlet-name>
+    <url-pattern>/tcp/TcpUnRegister</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>TcpWrite</servlet-name>
+    <servlet-class>com.dinghz.tcpproxy.http.TcpWrite</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>TcpWrite</servlet-name>
+    <url-pattern>/tcp/TcpWrite</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>TcpRead</servlet-name>
+    <servlet-class>com.dinghz.tcpproxy.http.TcpRead</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>TcpRead</servlet-name>
+    <url-pattern>/tcp/TcpRead</url-pattern>
+  </servlet-mapping>
+</web-app>
