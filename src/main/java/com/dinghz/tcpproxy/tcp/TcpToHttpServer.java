@@ -8,15 +8,10 @@ import org.apache.commons.codec.binary.Hex;
 
 import java.io.*;
 import java.net.*;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class TcpToHttpServer {
-
-    static final AtomicInteger key = new AtomicInteger(0);
 
     static String baseUrl;
     static String remoteHost;
@@ -32,7 +27,7 @@ public class TcpToHttpServer {
             do {
                 final Socket client = server.accept();
 
-                final String jdbcid = key.getAndIncrement() + "";
+                final String jdbcid = UUID.randomUUID().toString();
 
                 Util.log("新连接" + client + " " + jdbcid);
 

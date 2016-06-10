@@ -7,7 +7,6 @@ import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
-import java.net.UnknownHostException;
 import java.util.Arrays;
 
 public class TcpProxy {
@@ -23,16 +22,16 @@ public class TcpProxy {
 		this.port = port;
 	}
 
-	public void connect() throws UnknownHostException, IOException {
+	public void connect() throws IOException {
 		socket = new Socket();
-		socket.connect(new InetSocketAddress(host, port), 10 * 1000);// 10???????????
-		socket.setSoTimeout(10 * 1000);// 10??????
+		socket.connect(new InetSocketAddress(host, port), 10 * 1000);
+		socket.setSoTimeout(10 * 1000);
 		socket.setKeepAlive(true);
 
 		input = new BufferedInputStream(socket.getInputStream());
 		out = new BufferedOutputStream(socket.getOutputStream());
 
-		Util.log("?????????" + socket);
+		Util.log("创建连接:" + socket);
 	}
 
 	public void write(byte[] bs) throws IOException {
@@ -100,7 +99,7 @@ public class TcpProxy {
 		if(socket != null) {
 			socket.close();
 
-			Util.log("????????" + socket);
+			Util.log("关闭连接:" + socket);
 			
 			socket = null;
 		}

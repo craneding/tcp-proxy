@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class TcpCache {
 
-	static final Map<String, TcpProxy> tcpProxys = new ConcurrentHashMap<String, TcpProxy>();
+	static final Map<String, TcpProxy> tcpProxys = new ConcurrentHashMap<>();
 	
 	public static void newTcpProxy(String tcpid, TcpProxy tcpProxy) throws IOException {
 		removeTcpProxy(tcpid);
