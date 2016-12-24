@@ -198,7 +198,7 @@ public class TcpToHttpServer {
             boolean b = responseCode == HttpURLConnection.HTTP_OK;
 
             if (!b) {
-                Util.log(responseCode + " " + spec + " ");
+                Util.log(responseCode + " " + spec + " " + new String(readBytes(conn.getErrorStream())));
             }
 
             return b;
@@ -237,25 +237,15 @@ public class TcpToHttpServer {
 
             int responseCode = conn.getResponseCode();
 
-            if (responseCode != HttpURLConnection.HTTP_OK)
-                throw new IOException(conn.getResponseMessage());
+            if (responseCode != HttpURLConnection.HTTP_OK) {
+                input = new BufferedInputStream(conn.getErrorStream());
 
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
+                throw new IOException(new String(readBytes(input)));
+            }
+
             input = new BufferedInputStream(conn.getInputStream());
-            do {
-                byte[] bs = new byte[1024];
 
-                int len = input.read(bs);
-
-                if (len == -1)
-                    break;
-
-                os.write(Arrays.copyOf(bs, len));
-            } while (true);
-
-            os.close();
-
-            return os.toByteArray();
+            return readBytes(input);
         } finally {
             if (out != null)
                 out.close();
@@ -266,6 +256,25 @@ public class TcpToHttpServer {
             if (conn != null)
                 conn.disconnect();
         }
+    }
+
+    private static byte[] readBytes(InputStream input) throws IOException {
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+
+        do {
+            byte[] bs = new byte[1024];
+
+            int len = input.read(bs);
+
+            if (len == -1)
+                break;
+
+            os.write(Arrays.copyOf(bs, len));
+        } while (true);
+
+        os.close();
+
+        return os.toByteArray();
     }
 
     static boolean upload(String spec, String tcpid, byte[] data) throws IOException {
