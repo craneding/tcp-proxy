@@ -16,7 +16,7 @@ public class Util {
     private static final boolean logEnable = Boolean.valueOf(System.getProperty("log.enable", "true"));
 
     public static enum Parameters {
-        tcpid, tcpdata, tcphost, tcpport
+        tcpid, tcpdata, tcphost, tcpport, tcpuser, tcppasswd
     }
 
     public static String getTcpId(HttpServletRequest req) throws IOException {
@@ -43,7 +43,7 @@ public class Util {
         return Integer.valueOf(getParameter(req, Parameters.tcpport));
     }
 
-    static String getParameter(HttpServletRequest req, Parameters parameters) throws IOException {
+    public static String getParameter(HttpServletRequest req, Parameters parameters) throws IOException {
         String parameter = req.getParameter(parameters.name());
 
         if (parameter == null)

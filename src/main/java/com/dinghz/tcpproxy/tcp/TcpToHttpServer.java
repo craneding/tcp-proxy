@@ -3,13 +3,14 @@
  */
 package com.dinghz.tcpproxy.tcp;
 
+import com.dinghz.tcpproxy.Config;
 import com.dinghz.tcpproxy.Util;
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.codec.digest.Md5Crypt;
 
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class TcpToHttpServer {
 
@@ -23,45 +24,71 @@ public class TcpToHttpServer {
         remotePort = Integer.valueOf(args[2]);
         Integer localport = Integer.valueOf(args[3]);
 
+        Scanner scanner = new Scanner(System.in);
+        PrintStream printStream = new PrintStream(System.out);
+
+        printStream.print("passwd:");
+        String passwd = scanner.nextLine();
+
         try (ServerSocket server = new ServerSocket(localport)) {
+            Util.log("启动成功:" + localport);
+
             do {
                 final Socket client = server.accept();
 
                 final String jdbcid = UUID.randomUUID().toString();
 
-                Util.log("新连接" + client + " " + jdbcid);
+                String username = Config.ips.get(client.getInetAddress().getHostAddress());
 
-                newTask(client, jdbcid);
+                Util.log("新连接" + client + " " + jdbcid + " " + (username == null ? "unknown" : username));
+
+                if (username == null)
+                    throw new RuntimeException("so bad");
+
+                newTask(client, jdbcid, username, Md5Crypt.md5Crypt(passwd.trim().getBytes(), Config.salt));
             } while (true);
         }
 
     }
 
-    protected static void newTask(final Socket client, final String jdbcid) {
-        final Runnable readRunnable = () -> startRead(client, jdbcid);
+    protected static void newTask(final Socket client, final String jdbcid, final String username, final String passwd) {
+        final Runnable readRunnable = new Runnable() {
+            @Override
+            public void run() {
+                startRead(client, jdbcid);
+            }
+        };
 
-        final Runnable writeRunnable = () -> startWrite(client, jdbcid);
+        final Runnable writeRunnable = new Runnable() {
+            @Override
+            public void run() {
+                startWrite(client, jdbcid);
+            }
+        };
 
-        Runnable registerRunnable = () -> {
-            try {
-                client.setKeepAlive(true);
+        Runnable registerRunnable = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    client.setKeepAlive(true);
 
-                if (sendRegister(jdbcid)) {
-                    runInThread(readRunnable);
+                    if (sendRegister(jdbcid, username, passwd)) {
+                        runInThread(readRunnable);
 
-                    runInThread(writeRunnable);
-                } else {
+                        runInThread(writeRunnable);
+                    } else {
+                        try {
+                            client.close();
+                        } catch (IOException e1) {
+                        }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+
                     try {
                         client.close();
                     } catch (IOException e1) {
                     }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-
-                try {
-                    client.close();
-                } catch (IOException e1) {
                 }
             }
         };
@@ -118,7 +145,7 @@ public class TcpToHttpServer {
                 //String encodeHexString = Hex.encodeHexString(bs);
                 //String encodeHexString = Base64.encodeBase64String(bs);
                 /*
-				Util.log(">>" + encodeHexString);
+                Util.log(">>" + encodeHexString);
 				
 				String spec = baseUrl + "/TcpWrite";
 				
@@ -144,13 +171,15 @@ public class TcpToHttpServer {
         }
     }
 
-    public static boolean sendRegister(String jdbcid) throws IOException {
+    public static boolean sendRegister(String jdbcid, String username, String passwd) throws IOException {
         String spec = baseUrl + "/TcpRegister";
 
         Map<String, String> parms = new LinkedHashMap<>();
         parms.put("tcpid", jdbcid);
         parms.put("tcphost", remoteHost);
         parms.put("tcpport", remotePort + "");
+        parms.put(Util.Parameters.tcpuser.name(), username);
+        parms.put(Util.Parameters.tcppasswd.name(), passwd);
 
         return post(spec, parms);
     }
