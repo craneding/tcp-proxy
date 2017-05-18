@@ -25,10 +25,10 @@ public class TcpToHttpServer {
         Integer localport = Integer.valueOf(args[3]);
 
         String passwd = System.getenv("tcp_proxy_pwd");
-        if(passwd == null || passwd.trim().isEmpty()) {
+        if (passwd == null || passwd.trim().isEmpty()) {
             passwd = System.getProperty("tcp_proxy_pwd");
 
-            if(passwd == null || passwd.trim().isEmpty()) {
+            if (passwd == null || passwd.trim().isEmpty()) {
                 Scanner scanner = new Scanner(System.in);
                 PrintStream printStream = new PrintStream(System.out);
 
@@ -38,7 +38,7 @@ public class TcpToHttpServer {
         }
 
         try (ServerSocket server = new ServerSocket(localport)) {
-            Util.log("启动成功:" + localport);
+            Util.log("启动成功:" + localport, true);
 
             do {
                 final Socket client = server.accept();
@@ -47,10 +47,12 @@ public class TcpToHttpServer {
 
                 String username = Config.ips.get(client.getInetAddress().getHostAddress());
 
-                Util.log("新连接" + client + " " + jdbcid + " " + (username == null ? "unknown" : username));
+                if (username == null) {
+                    Util.log("新连接" + client + " " + jdbcid + " " + (username == null ? "unknown" : username) + " so bad.", true);
 
-                if (username == null)
                     throw new RuntimeException("so bad");
+                } else
+                    Util.log("新连接" + client + " " + jdbcid + " " + (username == null ? "unknown" : username) + " so bad.", true);
 
                 newTask(client, jdbcid, username, Md5Crypt.md5Crypt(passwd.trim().getBytes(), Config.salt));
             } while (true);

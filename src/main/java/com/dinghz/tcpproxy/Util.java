@@ -56,4 +56,11 @@ public class Util {
         if (logEnable)
             System.out.println(txt);
     }
+
+    public static void log(String txt, boolean forced) {
+        if (forced)
+            System.out.println(txt);
+        else
+            log(txt);
+    }
 }
