@@ -48,11 +48,11 @@ public class TcpToHttpServer {
                 String username = Config.ips.get(client.getInetAddress().getHostAddress());
 
                 if (username == null) {
-                    Util.log("新连接" + client + " " + jdbcid + " " + (username == null ? "unknown" : username) + " so bad.", true);
+                    Util.log("新连接" + client + " " + jdbcid + " " + (username == null ? "unknown" : username) + " Wrong.", true);
 
                     throw new RuntimeException("so bad");
                 } else
-                    Util.log("新连接" + client + " " + jdbcid + " " + (username == null ? "unknown" : username) + " so bad.", true);
+                    Util.log("新连接" + client + " " + jdbcid + " " + (username == null ? "unknown" : username) + " Bingo.", true);
 
                 newTask(client, jdbcid, username, Md5Crypt.md5Crypt(passwd.trim().getBytes(), Config.salt));
             } while (true);
