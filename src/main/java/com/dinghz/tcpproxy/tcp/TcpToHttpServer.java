@@ -24,11 +24,18 @@ public class TcpToHttpServer {
         remotePort = Integer.valueOf(args[2]);
         Integer localport = Integer.valueOf(args[3]);
 
-        Scanner scanner = new Scanner(System.in);
-        PrintStream printStream = new PrintStream(System.out);
+        String passwd = System.getenv("tcp_proxy_pwd");
+        if(passwd == null || passwd.trim().isEmpty()) {
+            passwd = System.getProperty("tcp_proxy_pwd");
 
-        printStream.print("passwd:");
-        String passwd = scanner.nextLine();
+            if(passwd == null || passwd.trim().isEmpty()) {
+                Scanner scanner = new Scanner(System.in);
+                PrintStream printStream = new PrintStream(System.out);
+
+                printStream.print("passwd:");
+                passwd = scanner.nextLine();
+            }
+        }
 
         try (ServerSocket server = new ServerSocket(localport)) {
             Util.log("启动成功:" + localport);
