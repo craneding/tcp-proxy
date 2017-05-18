@@ -20,8 +20,14 @@ public class Config {
     public static Map<String, String> ips = new HashMap<>();
 
     static {
-        ips.put("127.0.0.1", "dinghz");
+        ips.put("127.0.0.1", "localhost");
         ips.put("192.168.30.246", "dinghz");
+        ips.put("192.168.30.248", "lizt");
+        ips.put("192.168.30.243", "huangch");
+        ips.put("192.168.30.247", "chenj");
+        ips.put("192.168.30.245", "zhaoxl");
+        ips.put("192.168.30.58", "chends");
+        ips.put("192.168.30.51", "fengzp");
     }
 
 }
