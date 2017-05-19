@@ -93,6 +93,8 @@ public class TcpToHttpServer {
                         runInThread(writeRunnable);
                     } else {
                         try {
+                            Util.log("关闭连接" + client, true);
+
                             client.close();
                         } catch (IOException e1) {
                         }
@@ -101,6 +103,8 @@ public class TcpToHttpServer {
                     e.printStackTrace();
 
                     try {
+                        Util.log("关闭连接" + client, true);
+
                         client.close();
                     } catch (IOException e1) {
                     }
@@ -117,7 +121,7 @@ public class TcpToHttpServer {
         Map<String, String> parms = new LinkedHashMap<>();
         parms.put("tcpid", jdbcid);
 
-        try (OutputStream out = new BufferedOutputStream(client.getOutputStream());) {
+        try (OutputStream out = new BufferedOutputStream(client.getOutputStream())) {
             do {
                 byte[] bs = postAndGetData(spec, parms);
 
@@ -134,9 +138,13 @@ public class TcpToHttpServer {
                 }
             } while (true);
         } catch (IOException e) {
-            e.printStackTrace();
+            if (e.getMessage() != null && e.getMessage().indexOf("java.net.SocketException: Socket closed") != -1) {
+            } else {
+                e.printStackTrace();
+            }
         } finally {
             try {
+                Util.log("关闭连接" + client, true);
                 client.close();
             } catch (IOException e) {
             }
@@ -178,6 +186,8 @@ public class TcpToHttpServer {
         } catch (IOException e) {
         } finally {
             try {
+                Util.log("关闭连接" + client, true);
+
                 client.close();
             } catch (IOException e) {
             }
@@ -347,7 +357,7 @@ public class TcpToHttpServer {
             boolean b = responseCode == HttpURLConnection.HTTP_OK;
 
             if (!b) {
-                Util.log(responseCode + " " + spec + " ");
+                Util.log(responseCode + " " + spec + " ", true);
             }
 
             return b;
