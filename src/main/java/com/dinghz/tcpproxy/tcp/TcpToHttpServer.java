@@ -130,7 +130,7 @@ public class TcpToHttpServer {
                     out.flush();
 
                     Util.log("<<" + Hex.encodeHexString(bs));
-                    Util.log(username + " << " + remoteHost + " " + bs.length + "字节", true);
+                    Util.log(username + " << " + remoteHost + ":" + remotePort + " " + bs.length + "字节", true);
                 }
 
                 try {
@@ -183,7 +183,7 @@ public class TcpToHttpServer {
 
                 String spec = baseUrl + "/TcpWrite";
 
-                Util.log(username + " >> " + remoteHost + " " + bs.length + "字节", true);
+                Util.log(username + " >> " + remoteHost + ":" + remotePort + " " + bs.length + "字节", true);
 
                 status = upload(spec, tcpid, bs);
             } while (status);
