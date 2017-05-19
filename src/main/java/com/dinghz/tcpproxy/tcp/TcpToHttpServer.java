@@ -139,7 +139,8 @@ public class TcpToHttpServer {
                 }
             } while (true);
         } catch (IOException e) {
-            if (e.getMessage() != null && e.getMessage().indexOf("java.net.SocketException: Socket closed") != -1) {
+            if (e.getMessage() != null && (e.getMessage().indexOf("Socket closed") != -1 || e.getMessage()
+                    .indexOf("socket is closed") != -1)) {
             } else {
                 e.printStackTrace();
             }
