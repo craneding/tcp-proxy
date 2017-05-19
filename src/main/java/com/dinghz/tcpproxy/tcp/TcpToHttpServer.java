@@ -126,6 +126,7 @@ public class TcpToHttpServer {
                 byte[] bs = postAndGetData(spec, parms);
 
                 Util.log("<<" + Hex.encodeHexString(bs));
+                Util.log(jdbcid + "收到" + bs.length + "字节");
 
                 if (bs.length > 0) {
                     out.write(bs);
@@ -180,6 +181,8 @@ public class TcpToHttpServer {
 				*/
 
                 String spec = baseUrl + "/TcpWrite";
+
+                Util.log(tcpid + "发送" + bs.length + "字节");
 
                 status = upload(spec, tcpid, bs);
             } while (status);
