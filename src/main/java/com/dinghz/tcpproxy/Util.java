@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class Util {
 
@@ -60,7 +61,7 @@ public class Util {
 
     public static void log(String txt, boolean forced) {
         if (forced)
-            System.out.println(new SimpleDateFormat("[yyyy-MM-dd hh:mm:ss S] ") + txt);
+            System.out.println(new SimpleDateFormat("[yyyy-MM-dd hh:mm:ss S] ").format(new Date()) + txt);
         else
             log(txt);
     }
