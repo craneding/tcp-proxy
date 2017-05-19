@@ -10,6 +10,7 @@ import org.apache.commons.codec.binary.Hex;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.net.URLDecoder;
+import java.text.SimpleDateFormat;
 
 public class Util {
 
@@ -59,7 +60,7 @@ public class Util {
 
     public static void log(String txt, boolean forced) {
         if (forced)
-            System.out.println(txt);
+            System.out.println(new SimpleDateFormat("[yyyy-MM-dd hh:mm:ss S] ") + txt);
         else
             log(txt);
     }
