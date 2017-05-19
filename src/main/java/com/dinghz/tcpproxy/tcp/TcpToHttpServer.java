@@ -125,12 +125,12 @@ public class TcpToHttpServer {
             do {
                 byte[] bs = postAndGetData(spec, parms);
 
-                Util.log("<<" + Hex.encodeHexString(bs));
-                Util.log(jdbcid + "收到" + bs.length + "字节", true);
-
                 if (bs.length > 0) {
                     out.write(bs);
                     out.flush();
+
+                    Util.log("<<" + Hex.encodeHexString(bs));
+                    Util.log(jdbcid + "收到" + bs.length + "字节", true);
                 }
 
                 try {
