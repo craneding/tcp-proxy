@@ -28,6 +28,7 @@ public class Config {
         ips.put("192.168.30.245", "zhaoxl");
         ips.put("192.168.30.58", "chends");
         ips.put("192.168.30.51", "fengzp");
+        ips.put("192.168.40.119", "yangtl");
     }
 
 }

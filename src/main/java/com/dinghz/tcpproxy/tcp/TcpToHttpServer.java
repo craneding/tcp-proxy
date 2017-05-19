@@ -50,7 +50,13 @@ public class TcpToHttpServer {
                 if (username == null) {
                     Util.log("新连接" + client + " " + jdbcid + " " + (username == null ? "unknown" : username) + " Wrong.", true);
 
-                    throw new RuntimeException("so bad");
+                    try {
+                        client.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    continue;
                 } else
                     Util.log("新连接" + client + " " + jdbcid + " " + (username == null ? "unknown" : username) + " Bingo.", true);
 
