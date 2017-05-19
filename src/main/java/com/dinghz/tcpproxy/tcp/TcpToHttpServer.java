@@ -70,14 +70,14 @@ public class TcpToHttpServer {
         final Runnable readRunnable = new Runnable() {
             @Override
             public void run() {
-                startRead(client, jdbcid);
+                startRead(client, jdbcid, username);
             }
         };
 
         final Runnable writeRunnable = new Runnable() {
             @Override
             public void run() {
-                startWrite(client, jdbcid);
+                startWrite(client, jdbcid, username);
             }
         };
 
@@ -115,7 +115,7 @@ public class TcpToHttpServer {
         runInThread(registerRunnable);
     }
 
-    private static void startRead(Socket client, String jdbcid) {
+    private static void startRead(Socket client, String jdbcid, String username) {
         String spec = baseUrl + "/TcpRead";
 
         Map<String, String> parms = new LinkedHashMap<>();
@@ -130,7 +130,7 @@ public class TcpToHttpServer {
                     out.flush();
 
                     Util.log("<<" + Hex.encodeHexString(bs));
-                    Util.log(jdbcid + " 收到 " + bs.length + "字节", true);
+                    Util.log(username + " << " + remoteHost + " " + bs.length + "字节", true);
                 }
 
                 try {
@@ -155,7 +155,7 @@ public class TcpToHttpServer {
         }
     }
 
-    private static void startWrite(final Socket client, final String tcpid) {
+    private static void startWrite(final Socket client, final String tcpid, String username) {
         try (InputStream in = new BufferedInputStream(client.getInputStream());) {
             boolean status;
             do {
@@ -183,7 +183,7 @@ public class TcpToHttpServer {
 
                 String spec = baseUrl + "/TcpWrite";
 
-                Util.log(tcpid + " 发送 " + bs.length + "字节", true);
+                Util.log(username + " >> " + remoteHost + " " + bs.length + "字节", true);
 
                 status = upload(spec, tcpid, bs);
             } while (status);

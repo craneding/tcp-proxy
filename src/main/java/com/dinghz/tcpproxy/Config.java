@@ -20,7 +20,7 @@ public class Config {
     public static Map<String, String> ips = new HashMap<>();
 
     static {
-        ips.put("127.0.0.1", "localhost");
+        //ips.put("127.0.0.1", "localhost");
         ips.put("192.168.30.246", "丁鹤泽");
         ips.put("192.168.30.248", "李振棠");
         ips.put("192.168.30.243", "黄炽桓");
