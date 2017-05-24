@@ -241,6 +241,7 @@ public class TcpToHttpServer {
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Accept-Charset", "utf-8");
             conn.setRequestProperty("contentType", "utf-8");
+//            conn.setRequestProperty("Content-type", "text/html;charset=utf-8");
             conn.connect();
 
             if (builder.length() > 0) {

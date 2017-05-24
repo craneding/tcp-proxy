@@ -23,8 +23,12 @@ public class TcpRegister extends HttpServlet {
         String username = Util.getParameter(req, Util.Parameters.tcpuser);
         String passwd = Util.getParameter(req, Util.Parameters.tcppasswd);
 
-        if (!(Config.ips.keySet().contains(username) && Config.passwd.equals(passwd)))
+        if (!(Config.ips.values().contains(username) && Config.passwd.equals(passwd))) {
+            Util.log("check:" + username + " " + passwd + " so bad", true);
+
             throw new ServletException("so bad");
+        } else
+            Util.log("check:" + username + " " + passwd + " good", true);
 
         TcpProxy tcpProxy = new TcpProxy(tcpHost, tcpPort);
 

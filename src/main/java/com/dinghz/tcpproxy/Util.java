@@ -46,7 +46,7 @@ public class Util {
     }
 
     public static String getParameter(HttpServletRequest req, Parameters parameters) throws IOException {
-        String parameter = req.getParameter(parameters.name());
+        String parameter = new String(req.getParameter(parameters.name()).getBytes("ISO8859_1"), "utf-8");
 
         if (parameter == null)
             throw new IOException(parameters.name() + " is not null.");
