@@ -57,8 +57,9 @@ public class TcpToHttpServer {
                     }
 
                     continue;
-                } else
-                    Util.log("新连接" + client + " " + jdbcid + " " + (username == null ? "unknown" : username) + " Bingo.", true);
+                } else {
+                    Util.log("新连接" + client + " " + jdbcid + " " + (username == null ? "unknown" : username) + " Bingo.(remoteIP:" + remoteHost + ", remotePort:" + remotePort + ")", true);
+                }
 
                 newTask(client, jdbcid, username, Md5Crypt.md5Crypt(passwd.trim().getBytes(), Config.salt));
             } while (true);
@@ -210,7 +211,15 @@ public class TcpToHttpServer {
         parms.put(Util.Parameters.tcpuser.name(), username);
         parms.put(Util.Parameters.tcppasswd.name(), passwd);
 
-        return post(spec, parms);
+        try {
+            return post(spec, parms);
+        } catch (IOException e1) {
+            Util.log("url:" + spec + " error:" + e1.getMessage());
+
+            e1.printStackTrace();
+
+            return false;
+        }
     }
 
     public static boolean sendUnRegister(String jdbcid) {
@@ -221,6 +230,8 @@ public class TcpToHttpServer {
         try {
             return post(spec, parms);
         } catch (IOException e1) {
+            Util.log("url:" + spec + " error:" + e1.getMessage());
+
             e1.printStackTrace();
         }
 
