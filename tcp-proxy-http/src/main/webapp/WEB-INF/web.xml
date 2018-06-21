@@ -8,9 +8,13 @@
     <welcome-file>index.html</welcome-file>
   </welcome-file-list>
 
+  <listener>
+    <listener-class>com.dinghz.tcpproxy.http.listener.AppContextListener</listener-class>
+  </listener>
+
   <servlet>
     <servlet-name>TcpRegister</servlet-name>
-    <servlet-class>com.dinghz.tcpproxy.http.TcpRegister</servlet-class>
+    <servlet-class>com.dinghz.tcpproxy.http.servlet.TcpRegister</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>TcpRegister</servlet-name>
@@ -19,7 +23,7 @@
 
   <servlet>
     <servlet-name>TcpUnRegister</servlet-name>
-    <servlet-class>com.dinghz.tcpproxy.http.TcpUnRegister</servlet-class>
+    <servlet-class>com.dinghz.tcpproxy.http.servlet.TcpUnRegister</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>TcpUnRegister</servlet-name>
@@ -28,7 +32,7 @@
 
   <servlet>
     <servlet-name>TcpWrite</servlet-name>
-    <servlet-class>com.dinghz.tcpproxy.http.TcpWrite</servlet-class>
+    <servlet-class>com.dinghz.tcpproxy.http.servlet.TcpWrite</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>TcpWrite</servlet-name>
@@ -37,7 +41,7 @@
 
   <servlet>
     <servlet-name>TcpRead</servlet-name>
-    <servlet-class>com.dinghz.tcpproxy.http.TcpRead</servlet-class>
+    <servlet-class>com.dinghz.tcpproxy.http.servlet.TcpRead</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>TcpRead</servlet-name>
