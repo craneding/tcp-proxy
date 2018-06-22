@@ -9,6 +9,7 @@
         <module>tcp-proxy-tcp</module>
         <module>tcp-proxy-http</module>
         <module>tcp-proxy-core</module>
+        <module>tcp-proxy-cert</module>
     </modules>
     <name>tcp-proxy Maven Webapp</name>
     <url>http://maven.apache.org</url>

@@ -6,9 +6,6 @@ package com.dinghz.tcpproxy.tcp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.PrintStream;
-import java.util.Scanner;
-
 public class TcpToHttpServer {
 
     public static void main(String[] args) {
@@ -28,21 +25,6 @@ public class TcpToHttpServer {
         }
 
         final Logger logger = LoggerFactory.getLogger(TcpToHttpServer.class);
-
-        String passwd = System.getenv("tcp_proxy_pwd");
-        if (passwd == null || passwd.trim().isEmpty()) {
-            passwd = System.getProperty("tcp_proxy_pwd");
-
-            if (passwd == null || passwd.trim().isEmpty()) {
-                Scanner scanner = new Scanner(System.in);
-                PrintStream printStream = new PrintStream(System.out);
-
-                printStream.print("passwd:");
-                passwd = scanner.nextLine();
-            }
-        }
-
-        TcpConfig.TCP_PROXY_PWD = "yitop@123456#qwerty";
 
         try {
             TcpServer.instance().start();

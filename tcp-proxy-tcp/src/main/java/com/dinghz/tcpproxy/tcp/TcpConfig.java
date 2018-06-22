@@ -14,6 +14,5 @@ public class TcpConfig {
     public static String REMOTE_HOST;
     public static Integer REMOTE_PORT;
     public static String BASE_URL;
-    public static String TCP_PROXY_PWD;
 
 }

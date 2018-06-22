@@ -1,28 +1,28 @@
 package com.dinghz.tcpproxy;
 
-import org.apache.commons.codec.digest.Md5Crypt;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 /**
  * Config
  *
  * @author dinghz
  * @date 2017/5/17
- * @company  丁小样同学工作室
+ * @company 丁小样同学工作室
  * @email crane.ding@163.com
  */
 public class Config {
 
-    public static String salt = "******";
-    public static String passwd = Md5Crypt.md5Crypt("******".getBytes(), Config.salt);
-    public static final Map<String, String> ips = new ConcurrentHashMap<>();
+    public static boolean TCP_PROXY_AUTH;
+    public static String TCP_PROXY_AUTHCODE;
 
     static {
-        //测试
+        if (System.getenv("tcp_proxy_auth") == null) {
+            Config.TCP_PROXY_AUTH = Boolean.valueOf(System.getProperty("tcp_proxy_auth", "false"));
+        } else {
+            Config.TCP_PROXY_AUTH = Boolean.valueOf(System.getenv("tcp_proxy_auth"));
+        }
 
+        if (Config.TCP_PROXY_AUTHCODE == null) {
+            Config.TCP_PROXY_AUTHCODE = System.getProperty("tcp_proxy_authcode", "NULL");
+        }
     }
 
 }

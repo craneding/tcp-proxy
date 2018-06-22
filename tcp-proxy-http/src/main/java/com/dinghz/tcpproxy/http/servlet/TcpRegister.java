@@ -5,6 +5,7 @@ package com.dinghz.tcpproxy.http.servlet;
 
 import com.dinghz.tcpproxy.Config;
 import com.dinghz.tcpproxy.Util;
+import com.dinghz.tcpproxy.cert.Cert;
 import com.dinghz.tcpproxy.http.cache.TcpCache;
 import com.dinghz.tcpproxy.http.tcpclient.TcpClient;
 import io.netty.channel.ChannelFuture;
@@ -28,10 +29,19 @@ public class TcpRegister extends HttpServlet {
         String tcpId = Util.getTcpId(req);
         String tcpHost = Util.getTcpHost(req);
         int tcpPort = Util.getTcpPort(req);
+        String ip = Util.getParameter(req, Util.Parameters.tcpip);
         String username = Util.getParameter(req, Util.Parameters.tcpuser);
         String passwd = Util.getParameter(req, Util.Parameters.tcppasswd);
 
-        if (!(Config.ips.values().contains(username) && Config.passwd.equals(passwd))) {
+        String readUserName;
+
+        if (Config.TCP_PROXY_AUTH) {
+            readUserName = Cert.getNewInstance().hasCert(ip, passwd);
+        } else {
+            readUserName = username;
+        }
+
+        if (readUserName == null || readUserName.trim().isEmpty() || !readUserName.equals(username)) {
             logger.info("check:" + username + " " + passwd + " so bad", true);
 
             resp.getWriter().write("MyErr:username or passwd is wrong(code:03)");
@@ -39,7 +49,7 @@ public class TcpRegister extends HttpServlet {
 
             return;
         } else {
-            logger.info("check:" + username + " " + passwd + " good", true);
+            logger.info("check:" + ip + " " + username + " good", true);
         }
 
         try {

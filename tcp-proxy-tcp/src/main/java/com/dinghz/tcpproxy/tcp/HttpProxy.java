@@ -49,13 +49,14 @@ public class HttpProxy {
         return upload(spec, tcpid, data);
     }
 
-    public static boolean sendRegister(String jdbcid, String username, String passwd) throws IOException {
+    public static boolean sendRegister(String jdbcid, String ip, String username, String passwd) throws IOException {
         String spec = TcpConfig.BASE_URL + "/TcpRegister";
 
         Map<String, String> parms = new LinkedHashMap<>();
         parms.put("tcpid", jdbcid);
         parms.put("tcphost", TcpConfig.REMOTE_HOST);
         parms.put("tcpport", TcpConfig.REMOTE_PORT + "");
+        parms.put(Util.Parameters.tcpip.name(), ip);
         parms.put(Util.Parameters.tcpuser.name(), username);
         parms.put(Util.Parameters.tcppasswd.name(), passwd);
 

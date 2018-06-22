@@ -44,6 +44,12 @@
             <artifactId>tcp-proxy-core</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.dinghz</groupId>
+            <artifactId>tcp-proxy-cert</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
     </dependencies>
 
 </project>

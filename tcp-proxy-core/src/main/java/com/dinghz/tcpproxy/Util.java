@@ -10,7 +10,7 @@ import java.net.URLDecoder;
 public class Util {
 
     public static enum Parameters {
-        tcpid, tcpdata, tcphost, tcpport, tcpuser, tcppasswd
+        tcpid, tcpdata, tcphost, tcpport, tcpip, tcpuser, tcppasswd
     }
 
     public static String getTcpId(HttpServletRequest req) throws IOException {
