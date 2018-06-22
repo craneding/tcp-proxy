@@ -37,7 +37,11 @@ public class TcpServerHandler extends ChannelInboundHandlerAdapter {
 
         if (Config.TCP_PROXY_AUTH) {
             passwd = Cert.getNewInstance().passwd(ip, Config.TCP_PROXY_AUTHCODE);
-            username = Cert.getNewInstance().hasCert(ip, passwd);
+            if (passwd != null && !passwd.trim().isEmpty()) {
+                username = Cert.getNewInstance().hasCert(ip, passwd);
+            } else {
+                username = null;
+            }
         } else {
             passwd = "NOPASSWD";
             username = "NOUSERNAME";
