@@ -34,7 +34,7 @@ public class HttpProxy {
         byte[] bs = postAndGetData(spec, parms);
 
         if (bs.length > 0) {
-            logger.info("<<" + Hex.encodeHexString(bs));
+            //logger.info("<<" + Hex.encodeHexString(bs));
             logger.info(username + " << " + TcpConfig.REMOTE_HOST + ":" + TcpConfig.REMOTE_PORT + " " + bs.length + "字节", true);
         }
 

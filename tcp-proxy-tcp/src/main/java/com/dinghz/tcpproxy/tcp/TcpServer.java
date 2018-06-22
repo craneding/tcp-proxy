@@ -35,6 +35,8 @@ public class TcpServer {
     }
 
     public void start() throws Exception {
+        boolean good = false;
+
         try {
             ServerBootstrap b = new ServerBootstrap();
             b.option(ChannelOption.SO_BACKLOG, 1024)
@@ -46,10 +48,16 @@ public class TcpServer {
 
             Channel ch = b.bind(TcpConfig.LOCAL_PORT).sync().channel();
 
-            logger.info("{}", TcpConfig.LOCAL_PORT);
+            logger.info("监听 {} 成功", TcpConfig.LOCAL_PORT);
+
+            good = true;
 
             ch.closeFuture().sync();
         } finally {
+            if (!good) {
+                logger.error("监听 {} 失败", TcpConfig.LOCAL_PORT);
+            }
+
             stop();
         }
     }
