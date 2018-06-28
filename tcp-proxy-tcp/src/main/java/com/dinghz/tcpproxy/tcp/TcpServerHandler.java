@@ -5,7 +5,7 @@ import com.dinghz.tcpproxy.cert.Cert;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.util.AttributeKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @company 丁小样同学工作室
  * @email crane.ding@163.com
  */
-public class TcpServerHandler extends ChannelInboundHandlerAdapter {
+public class TcpServerHandler extends SimpleChannelInboundHandler<Object> {
     private static final Logger logger = LoggerFactory.getLogger(TcpServerHandler.class);
 
     @Override
@@ -98,7 +98,7 @@ public class TcpServerHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws IOException {
+    protected void channelRead0(ChannelHandlerContext ctx, Object msg) throws IOException {
         String jdbcid = ctx.channel().attr(AttributeKey.<String>valueOf("jdbcid")).get();
         String username = ctx.channel().attr(AttributeKey.<String>valueOf("username")).get();
 
