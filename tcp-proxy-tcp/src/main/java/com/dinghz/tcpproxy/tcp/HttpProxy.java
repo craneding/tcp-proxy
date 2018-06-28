@@ -1,7 +1,6 @@
 package com.dinghz.tcpproxy.tcp;
 
 import com.dinghz.tcpproxy.Util;
-import org.apache.commons.codec.binary.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +43,7 @@ public class HttpProxy {
     public static boolean tcpWrite(final String tcpid, String username, byte[] data) throws IOException {
         String spec = TcpConfig.BASE_URL + "/TcpWrite";
 
+        //logger.info(">>" + Hex.encodeHexString(data));
         logger.info(username + " >> " + TcpConfig.REMOTE_HOST + ":" + TcpConfig.REMOTE_PORT + " " + data.length + "字节", true);
 
         return upload(spec, tcpid, data);
