@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 public class TcpRegister extends HttpServlet {
     private static final long serialVersionUID = -8421614927735092760L;
@@ -55,8 +56,20 @@ public class TcpRegister extends HttpServlet {
         try {
             ChannelFuture channelFuture = TcpClient.instance().connect(tcpHost, tcpPort);
             channelFuture.channel().attr(AttributeKey.valueOf("tcpId")).set(tcpId);
-            TcpCache.newTcpProxy(tcpId, channelFuture);
-        } catch (Exception e) {
+
+            channelFuture.awaitUninterruptibly(5, TimeUnit.SECONDS);
+            if (channelFuture.isCancelled()) {
+                // Connection attempt cancelled by user
+                throw new RuntimeException("Connection attempt cancelled by user");
+            } else if (!channelFuture.isSuccess()) {
+                // You might get a NullPointerException here because the future
+                // might not be completed yet.
+                throw channelFuture.cause();
+            } else {
+                // Connection established successfully
+                TcpCache.newTcpProxy(tcpId, channelFuture);
+            }
+        } catch (Throwable e) {
             throw new ServletException(e.getMessage());
         }
 
