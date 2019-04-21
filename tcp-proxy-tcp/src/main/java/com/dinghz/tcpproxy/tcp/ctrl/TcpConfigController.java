@@ -33,13 +33,32 @@ public class TcpConfigController {
     }
 
     @PostMapping
-    public void create(TcpConfig tcpConfig) {
-        configService.startService(configRepository.save(tcpConfig));
+    public String create(TcpConfig tcpConfig) {
+        if (configRepository.existsByLocalPort(tcpConfig.getLocalPort())) {
+            return "local port is exist " + tcpConfig.getLocalPort();
+        }
+
+        String baseUrl = tcpConfig.getBaseUrl();
+        String remoteHost = tcpConfig.getRemoteHost();
+        Integer remotePort = tcpConfig.getRemotePort();
+        if (configRepository.existsByBaseUrlAndRemoteHostAndRemotePort(baseUrl, remoteHost, remotePort)) {
+            return "exist same proxy";
+        }
+
+        if (configService.startService(configRepository.save(tcpConfig))) {
+            return "start fail";
+        }
+
+        return "success";
     }
 
     @PatchMapping("{id}")
     @Transactional(rollbackFor = Exception.class)
-    public void update(@PathVariable("id") Integer id, TcpConfig tcpConfig) {
+    public String update(@PathVariable("id") Integer id, TcpConfig tcpConfig) {
+        if (configRepository.existsById(id)) {
+            return "not exist " + id;
+        }
+
         TcpConfig config = configRepository.getOne(id);
         config.setLocalPort(tcpConfig.getLocalPort());
         config.setRemoteHost(tcpConfig.getRemoteHost());
@@ -48,14 +67,20 @@ public class TcpConfigController {
 
         configService.stopService(tcpConfig);
         configService.startService(tcpConfig);
+
+        return "success";
     }
 
     @DeleteMapping("{id}")
-    public void delete(@PathVariable("id") Integer id) {
+    public String delete(@PathVariable("id") Integer id) {
         if (configRepository.existsById(id)) {
             configService.stopService(configRepository.getOne(id));
 
             configRepository.deleteById(id);
+
+            return "success";
+        } else {
+            return "not exist " + id;
         }
     }
 

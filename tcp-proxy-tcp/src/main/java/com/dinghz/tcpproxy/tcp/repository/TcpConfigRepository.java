@@ -13,4 +13,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
  */
 public interface TcpConfigRepository extends JpaRepository<TcpConfig, Integer> {
 
+    boolean existsByLocalPort(Integer localPort);
+
+    boolean existsByBaseUrlAndRemoteHostAndRemotePort(String baseUrl, String remoteHost, Integer remotePort);
+
 }
