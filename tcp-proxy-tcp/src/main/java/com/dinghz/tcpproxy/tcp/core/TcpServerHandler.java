@@ -1,17 +1,19 @@
-package com.dinghz.tcpproxy.tcp;
+package com.dinghz.tcpproxy.tcp.core;
 
 import com.dinghz.tcpproxy.Config;
 import com.dinghz.tcpproxy.cert.Cert;
+import com.dinghz.tcpproxy.tcp.domain.TcpConfig;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.util.AttributeKey;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -23,8 +25,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @company 丁小样同学工作室
  * @email crane.ding@163.com
  */
+@Slf4j
 public class TcpServerHandler extends SimpleChannelInboundHandler<Object> {
-    private static final Logger logger = LoggerFactory.getLogger(TcpServerHandler.class);
+    private final TcpConfig tcpConfig;
+
+    public TcpServerHandler(TcpConfig tcpConfig) {
+        this.tcpConfig = tcpConfig;
+    }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws IOException {
@@ -50,26 +57,37 @@ public class TcpServerHandler extends SimpleChannelInboundHandler<Object> {
         ctx.channel().attr(AttributeKey.valueOf("username")).set(username);
 
         if (username == null || username.trim().isEmpty()) {
-            logger.info("新连接" + remoteAddress + " " + jdbcid + " " + (username == null ? "unknown" : username) + " Wrong.");
+            log.info("新连接" + remoteAddress + " " + jdbcid + " " + (username == null ? "unknown" : username) + " Wrong.");
 
             ctx.close();
 
             return;
         } else {
-            logger.info("新连接" + remoteAddress + " " + jdbcid + " " + (username == null ? "unknown" : username) + " Bingo.(remoteIP:" + TcpConfig.REMOTE_HOST + ", remotePort:" + TcpConfig.REMOTE_PORT + ")");
+            log.info("新连接" + remoteAddress + " " + jdbcid + " " + (username == null ? "unknown" : username) + " Bingo.(remoteIP:" + tcpConfig
+                    .getRemoteHost() + ", remotePort:" + tcpConfig.getRemotePort() + ")");
         }
 
-        if (HttpProxy.sendRegister(jdbcid, ip, username, passwd)) {
+        if (HttpProxy.sendRegister(tcpConfig, jdbcid, ip, username, passwd)) {
             ctx.channel().attr(AttributeKey.valueOf("register")).set(true);
 
-            logger.info("认证成功 {} {}", jdbcid, username);
+            log.info("认证成功 {} {}", jdbcid, username);
         } else {
-            logger.info("认证失败 {} {}", jdbcid, username);
+            log.info("认证失败 {} {}", jdbcid, username);
 
             ctx.close();
 
             return;
         }
+
+        SessionInfo sessionInfo = new SessionInfo();
+        sessionInfo.setId(jdbcid);
+        sessionInfo.setUserName(username);
+        sessionInfo.setUserIp(ip);
+        sessionInfo.setRemoteIp(tcpConfig.getRemoteHost());
+        sessionInfo.setRemotePort(tcpConfig.getRemotePort());
+        sessionInfo.setActiveTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss s").format(new Date()));
+        sessionInfo.setRemark(tcpConfig.getName());
+        Cache.SESSION_MAP.put(jdbcid, sessionInfo);
 
         AtomicBoolean live = new AtomicBoolean(true);
         ctx.channel().attr(AttributeKey.valueOf("live")).set(live);
@@ -77,7 +95,7 @@ public class TcpServerHandler extends SimpleChannelInboundHandler<Object> {
         new Thread(() -> {
             try {
                 do {
-                    byte[] data = HttpProxy.tcpRead(jdbcid, username);
+                    byte[] data = HttpProxy.tcpRead(tcpConfig, jdbcid, username);
 
                     if (data.length > 0) {
                         ctx.channel().writeAndFlush(Unpooled.wrappedBuffer(data));
@@ -87,9 +105,9 @@ public class TcpServerHandler extends SimpleChannelInboundHandler<Object> {
                 } while (ctx.channel().isOpen() && live.get());
             } catch (Exception e) {
                 if (e.getMessage() != null && e.getMessage().startsWith("MyErr:")) {
-                    logger.error(e.getMessage());
+                    log.error(e.getMessage());
                 } else {
-                    logger.error(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
 
                 ctx.close();
@@ -106,7 +124,7 @@ public class TcpServerHandler extends SimpleChannelInboundHandler<Object> {
         byte[] value = new byte[byteBuf.readableBytes()];
         byteBuf.readBytes(value);
 
-        HttpProxy.tcpWrite(jdbcid, username, value);
+        HttpProxy.tcpWrite(tcpConfig, jdbcid, username, value);
     }
 
     @Override
@@ -117,7 +135,7 @@ public class TcpServerHandler extends SimpleChannelInboundHandler<Object> {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        logger.error(cause.getMessage(), cause);
+        log.error(cause.getMessage(), cause);
 
         ctx.close();
     }
@@ -133,12 +151,14 @@ public class TcpServerHandler extends SimpleChannelInboundHandler<Object> {
             live.set(false);
         }
 
-        logger.info("关闭连接 {} {}", jdbcid, username);
+        log.info("关闭连接 {} {}", jdbcid, username);
+
+        Cache.SESSION_MAP.remove(jdbcid);
 
         if (register != null && register) {
             ctx.channel().attr(AttributeKey.<Boolean>valueOf("register")).set(null);
 
-            HttpProxy.sendUnRegister(jdbcid);
+            HttpProxy.sendUnRegister(tcpConfig, jdbcid);
         }
     }
 

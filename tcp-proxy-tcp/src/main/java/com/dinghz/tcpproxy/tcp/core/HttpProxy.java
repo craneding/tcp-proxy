@@ -1,6 +1,7 @@
-package com.dinghz.tcpproxy.tcp;
+package com.dinghz.tcpproxy.tcp.core;
 
 import com.dinghz.tcpproxy.Util;
+import com.dinghz.tcpproxy.tcp.domain.TcpConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,9 +24,9 @@ import java.util.Set;
  */
 public class HttpProxy {
     private static final Logger logger = LoggerFactory.getLogger(HttpProxy.class);
-    
-    public static byte[] tcpRead(String jdbcid, String username) throws IOException {
-        String spec = TcpConfig.BASE_URL + "/TcpRead";
+
+    public static byte[] tcpRead(TcpConfig tcpConfig, String jdbcid, String username) throws IOException {
+        String spec = tcpConfig.getBaseUrl() + "/TcpRead";
 
         Map<String, String> parms = new LinkedHashMap<>();
         parms.put("tcpid", jdbcid);
@@ -34,28 +35,28 @@ public class HttpProxy {
 
         if (bs.length > 0) {
             //logger.info("<<" + Hex.encodeHexString(bs));
-            logger.info(username + " << " + TcpConfig.REMOTE_HOST + ":" + TcpConfig.REMOTE_PORT + " " + bs.length + "字节", true);
+            logger.info(username + " << " + tcpConfig.getRemoteHost() + ":" + tcpConfig.getRemotePort() + " " + bs.length + "字节", true);
         }
 
         return bs;
     }
 
-    public static boolean tcpWrite(final String tcpid, String username, byte[] data) throws IOException {
-        String spec = TcpConfig.BASE_URL + "/TcpWrite";
+    public static boolean tcpWrite(TcpConfig tcpConfig, String tcpid, String username, byte[] data) throws IOException {
+        String spec = tcpConfig.getBaseUrl() + "/TcpWrite";
 
         //logger.info(">>" + Hex.encodeHexString(data));
-        logger.info(username + " >> " + TcpConfig.REMOTE_HOST + ":" + TcpConfig.REMOTE_PORT + " " + data.length + "字节", true);
+        logger.info(username + " >> " + tcpConfig.getRemoteHost() + ":" + tcpConfig.getRemotePort() + " " + data.length + "字节", true);
 
         return upload(spec, tcpid, data);
     }
 
-    public static boolean sendRegister(String jdbcid, String ip, String username, String passwd) throws IOException {
-        String spec = TcpConfig.BASE_URL + "/TcpRegister";
+    public static boolean sendRegister(TcpConfig tcpConfig, String jdbcid, String ip, String username, String passwd) throws IOException {
+        String spec = tcpConfig.getBaseUrl() + "/TcpRegister";
 
         Map<String, String> parms = new LinkedHashMap<>();
         parms.put("tcpid", jdbcid);
-        parms.put("tcphost", TcpConfig.REMOTE_HOST);
-        parms.put("tcpport", TcpConfig.REMOTE_PORT + "");
+        parms.put("tcphost", tcpConfig.getRemoteHost());
+        parms.put("tcpport", tcpConfig.getRemotePort() + "");
         parms.put(Util.Parameters.tcpip.name(), ip);
         parms.put(Util.Parameters.tcpuser.name(), username);
         parms.put(Util.Parameters.tcppasswd.name(), passwd);
@@ -71,8 +72,8 @@ public class HttpProxy {
         }
     }
 
-    public static boolean sendUnRegister(String jdbcid) {
-        String spec = TcpConfig.BASE_URL + "/TcpUnRegister";
+    public static boolean sendUnRegister(TcpConfig tcpConfig, String jdbcid) {
+        String spec = tcpConfig.getBaseUrl() + "/TcpUnRegister";
         Map<String, String> parms = new LinkedHashMap<>();
         parms.put("tcpid", jdbcid);
 
@@ -122,11 +123,13 @@ public class HttpProxy {
 
             return b;
         } finally {
-            if (out != null)
+            if (out != null) {
                 out.close();
+            }
 
-            if (conn != null)
+            if (conn != null) {
                 conn.disconnect();
+            }
         }
     }
 
@@ -166,14 +169,17 @@ public class HttpProxy {
 
             return readBytes(input);
         } finally {
-            if (out != null)
+            if (out != null) {
                 out.close();
+            }
 
-            if (input != null)
+            if (input != null) {
                 input.close();
+            }
 
-            if (conn != null)
+            if (conn != null) {
                 conn.disconnect();
+            }
         }
     }
 
@@ -185,8 +191,9 @@ public class HttpProxy {
 
             int len = input.read(bs);
 
-            if (len == -1)
+            if (len == -1) {
                 break;
+            }
 
             os.write(Arrays.copyOf(bs, len));
         } while (true);
@@ -227,11 +234,13 @@ public class HttpProxy {
 
             return b;
         } finally {
-            if (out != null)
+            if (out != null) {
                 out.close();
+            }
 
-            if (conn != null)
+            if (conn != null) {
                 conn.disconnect();
+            }
         }
     }
 
@@ -241,14 +250,16 @@ public class HttpProxy {
 
         Set<String> keySet = parms.keySet();
         for (String key : keySet) {
-            if (builder.length() > 0)
+            if (builder.length() > 0) {
                 builder.append("&");
+            }
 
             builder.append(key).append("=").append(URLEncoder.encode(parms.get(key), "utf-8"));
         }
 
-        if (builder.length() > 0)
+        if (builder.length() > 0) {
             builder.append("&");
+        }
         builder.append("t=").append(System.currentTimeMillis());
         return builder;
     }

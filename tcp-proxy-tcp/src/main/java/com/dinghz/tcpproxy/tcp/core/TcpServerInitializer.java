@@ -1,5 +1,6 @@
-package com.dinghz.tcpproxy.tcp;
+package com.dinghz.tcpproxy.tcp.core;
 
+import com.dinghz.tcpproxy.tcp.domain.TcpConfig;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
@@ -14,11 +15,17 @@ import io.netty.channel.socket.SocketChannel;
  */
 public class TcpServerInitializer extends ChannelInitializer<SocketChannel> {
 
+    private final TcpConfig tcpConfig;
+
+    public TcpServerInitializer(TcpConfig tcpConfig) {
+        this.tcpConfig = tcpConfig;
+    }
+
     @Override
     protected void initChannel(SocketChannel ch) {
         ChannelPipeline p = ch.pipeline();
 
-        p.addLast(new TcpServerHandler());
+        p.addLast(new TcpServerHandler(tcpConfig));
     }
 
 }

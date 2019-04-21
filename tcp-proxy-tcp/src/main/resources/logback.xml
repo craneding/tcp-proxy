@@ -10,7 +10,7 @@
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <prudent>true</prudent>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${log.dir}/detail-tcp-proxy-tcp-${pro.name}.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>${log.dir}/detail-tcp-proxy-tcp-all.%d{yyyy-MM-dd}.log</fileNamePattern>
             <maxHistory>30</maxHistory>
         </rollingPolicy>
         <encoder>
