@@ -45,7 +45,7 @@ public class TcpConfigController {
             return "exist same proxy";
         }
 
-        if (configService.startService(configRepository.save(tcpConfig))) {
+        if (!configService.startService(configRepository.save(tcpConfig))) {
             return "start fail";
         }
 
