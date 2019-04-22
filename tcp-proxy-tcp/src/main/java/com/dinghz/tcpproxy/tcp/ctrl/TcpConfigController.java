@@ -60,6 +60,7 @@ public class TcpConfigController {
         }
 
         TcpConfig config = configRepository.getOne(id);
+        config.setName(tcpConfig.getName());
         config.setLocalPort(tcpConfig.getLocalPort());
         config.setRemoteHost(tcpConfig.getRemoteHost());
         config.setRemotePort(tcpConfig.getRemotePort());
