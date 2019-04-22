@@ -55,7 +55,7 @@ public class TcpConfigController {
     @PatchMapping("{id}")
     @Transactional(rollbackFor = Exception.class)
     public String update(@PathVariable("id") Integer id, TcpConfig tcpConfig) {
-        if (configRepository.existsById(id)) {
+        if (!configRepository.existsById(id)) {
             return "not exist " + id;
         }
 
