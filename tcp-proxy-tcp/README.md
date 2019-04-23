@@ -1,5 +1,5 @@
 
-### Configuring a Service
+### Configuring a Proxy
 
 1. Add a tcp proxy
 

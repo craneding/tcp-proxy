@@ -60,11 +60,21 @@ public class TcpConfigController {
         }
 
         TcpConfig config = configRepository.getOne(id);
-        config.setName(tcpConfig.getName());
-        config.setLocalPort(tcpConfig.getLocalPort());
-        config.setRemoteHost(tcpConfig.getRemoteHost());
-        config.setRemotePort(tcpConfig.getRemotePort());
-        config.setBaseUrl(tcpConfig.getBaseUrl());
+        if (tcpConfig.getName() != null) {
+            config.setName(tcpConfig.getName());
+        }
+        if (tcpConfig.getLocalPort() != null) {
+            config.setLocalPort(tcpConfig.getLocalPort());
+        }
+        if (tcpConfig.getRemoteHost() != null) {
+            config.setRemoteHost(tcpConfig.getRemoteHost());
+        }
+        if (tcpConfig.getRemotePort() != null) {
+            config.setRemotePort(tcpConfig.getRemotePort());
+        }
+        if (tcpConfig.getBaseUrl() != null) {
+            config.setBaseUrl(tcpConfig.getBaseUrl());
+        }
 
         configService.stopService(tcpConfig);
         configService.startService(tcpConfig);
