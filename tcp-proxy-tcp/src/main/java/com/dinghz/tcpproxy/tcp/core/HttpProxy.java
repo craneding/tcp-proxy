@@ -2,8 +2,7 @@ package com.dinghz.tcpproxy.tcp.core;
 
 import com.dinghz.tcpproxy.Util;
 import com.dinghz.tcpproxy.tcp.domain.TcpConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -22,9 +21,8 @@ import java.util.Set;
  * @company 丁小样同学工作室
  * @email crane.ding@163.com
  */
+@Slf4j
 public class HttpProxy {
-    private static final Logger logger = LoggerFactory.getLogger(HttpProxy.class);
-
     public static byte[] tcpRead(TcpConfig tcpConfig, String jdbcid, String username) throws IOException {
         String spec = tcpConfig.getBaseUrl() + "/TcpRead";
 
@@ -35,7 +33,7 @@ public class HttpProxy {
 
         if (bs.length > 0) {
             //logger.info("<<" + Hex.encodeHexString(bs));
-            logger.info(username + " << " + tcpConfig.getRemoteHost() + ":" + tcpConfig.getRemotePort() + " " + bs.length + "字节", true);
+            log.info(username + " << " + tcpConfig.getRemoteHost() + ":" + tcpConfig.getRemotePort() + " " + bs.length + "字节", true);
         }
 
         return bs;
@@ -45,7 +43,7 @@ public class HttpProxy {
         String spec = tcpConfig.getBaseUrl() + "/TcpWrite";
 
         //logger.info(">>" + Hex.encodeHexString(data));
-        logger.info(username + " >> " + tcpConfig.getRemoteHost() + ":" + tcpConfig.getRemotePort() + " " + data.length + "字节", true);
+        log.info(username + " >> " + tcpConfig.getRemoteHost() + ":" + tcpConfig.getRemotePort() + " " + data.length + "字节", true);
 
         return upload(spec, tcpid, data);
     }
@@ -64,7 +62,7 @@ public class HttpProxy {
         try {
             return post(spec, parms);
         } catch (IOException e1) {
-            logger.info("url:" + spec + " error:" + e1.getMessage());
+            log.info("url:" + spec + " error:" + e1.getMessage());
 
             e1.printStackTrace();
 
@@ -80,7 +78,7 @@ public class HttpProxy {
         try {
             return post(spec, parms);
         } catch (IOException e1) {
-            logger.info("url:" + spec + " error:" + e1.getMessage());
+            log.info("url:" + spec + " error:" + e1.getMessage());
 
             e1.printStackTrace();
         }
@@ -118,7 +116,7 @@ public class HttpProxy {
             boolean b = responseCode == HttpURLConnection.HTTP_OK;
 
             if (!b) {
-                logger.info(responseCode + " " + spec + " " + new String(readBytes(conn.getErrorStream())));
+                log.info(responseCode + " " + spec + " " + new String(readBytes(conn.getErrorStream())));
             }
 
             return b;
@@ -229,7 +227,7 @@ public class HttpProxy {
             boolean b = responseCode == HttpURLConnection.HTTP_OK;
 
             if (!b) {
-                logger.info(responseCode + " " + spec + " ", true);
+                log.info(responseCode + " " + spec + " ", true);
             }
 
             return b;
