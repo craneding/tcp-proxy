@@ -12,8 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -85,7 +85,7 @@ public class TcpServerHandler extends SimpleChannelInboundHandler<Object> {
         sessionInfo.setUserIp(ip);
         sessionInfo.setRemoteIp(tcpConfig.getRemoteHost());
         sessionInfo.setRemotePort(tcpConfig.getRemotePort());
-        sessionInfo.setActiveTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss s").format(new Date()));
+        sessionInfo.setActiveTime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss S")));
         sessionInfo.setRemark(tcpConfig.getName());
         Cache.SESSION_MAP.put(jdbcid, sessionInfo);
 

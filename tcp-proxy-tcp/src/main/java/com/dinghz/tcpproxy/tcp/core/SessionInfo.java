@@ -44,6 +44,11 @@ public class SessionInfo {
     private String activeTime;
 
     /**
+     * 活动时间
+     */
+    private String liveTime;
+
+    /**
      * 备注
      */
     private String remark;

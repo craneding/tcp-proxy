@@ -6,6 +6,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +26,20 @@ public class SessionController {
 
     @GetMapping
     public List<SessionInfo> list() {
-        return new ArrayList<>(Cache.SESSION_MAP.values());
+        ArrayList<SessionInfo> infos = new ArrayList<>(Cache.SESSION_MAP.values());
+
+        for (SessionInfo info : infos) {
+            LocalDateTime time = LocalDateTime.parse(info.getActiveTime(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss S"));
+
+            final Duration duration = Duration.between(time, LocalDateTime.now());
+            final String liveTime = String.format("%d天%d小时%d分钟",
+                    duration.toDays(),
+                    duration.toHours() - duration.toDays() * 24,
+                    duration.toMinutes() - duration.toHours() * 60);
+            info.setLiveTime(liveTime);
+        }
+
+        return infos;
     }
 
 }
