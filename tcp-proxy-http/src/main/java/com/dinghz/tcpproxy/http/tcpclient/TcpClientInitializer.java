@@ -5,6 +5,9 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import io.netty.handler.timeout.IdleStateHandler;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * TcpClientInitializer
@@ -21,6 +24,7 @@ public class TcpClientInitializer extends ChannelInitializer<SocketChannel> {
         ChannelPipeline p = ch.pipeline();
 
         //p.addLast(new LoggingHandler(LogLevel.INFO));
+        p.addLast(new IdleStateHandler(0, 0, 10, TimeUnit.MINUTES));
         p.addLast(new TcpClientHandler());
     }
 

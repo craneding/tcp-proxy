@@ -5,7 +5,6 @@ package com.dinghz.tcpproxy.http.servlet;
 
 import com.dinghz.tcpproxy.Util;
 import com.dinghz.tcpproxy.http.cache.TcpCache;
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.util.AttributeKey;
@@ -43,23 +42,12 @@ public class TcpRead extends HttpServlet {
         }
 
         try {
-            channel.attr(AttributeKey.valueOf("bu"));
-
-            List<ByteBuf> byteBufs = channel
-                    .attr(AttributeKey.<List<ByteBuf>>valueOf("byteBufs"))
+            List<byte[]> byteBufs = channel
+                    .attr(AttributeKey.<List<byte[]>>valueOf("byteBufs"))
                     .get();
 
             synchronized (byteBufs) {
-                for (ByteBuf byteBuf : byteBufs) {
-                    int len = byteBuf.readableBytes();
-
-                    if (len <= 0) {
-                        continue;
-                    }
-
-                    byte[] bs = new byte[byteBuf.readableBytes()];
-                    byteBuf.readBytes(bs);
-
+                for (byte[] bs : byteBufs) {
                     resp.getOutputStream().write(bs);
                     resp.getOutputStream().flush();
                 }
