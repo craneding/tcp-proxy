@@ -49,7 +49,7 @@ public class TcpServer {
             ch.closeFuture().addListener((ChannelFutureListener) future -> {
                 log.info("关闭监听 {} {}", tcpConfig.getLocalPort(), !future.channel().isOpen() ? "成功" : "失败");
             });
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             log.info("启动监听 " + tcpConfig.getLocalPort() + " 失败", e);
 
             return false;
