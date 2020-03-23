@@ -62,7 +62,7 @@ public class NatProxyServerHandler extends SimpleChannelInboundHandler<ByteBuf> 
             shareGroup.closeClients();
         }
 
-        log.info("[连接销毁][新连接][{}]", ctx.channel());
+        log.info("[连接销毁][{}]", ctx.channel());
     }
 
     @Override
