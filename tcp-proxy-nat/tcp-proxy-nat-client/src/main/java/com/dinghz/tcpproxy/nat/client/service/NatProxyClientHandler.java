@@ -38,6 +38,7 @@ public class NatProxyClientHandler extends SimpleChannelInboundHandler<ByteBuf> 
             NatTcpClient tcpClient = new NatTcpClient(c.getRealHost(), c.getRealPort(), new NatRealClientInitializer(c.getId(), ctx));
             tcpClient.start();
             tcpClient.connect();
+            log.info("[代理连接][连接][{}]", tcpClient.getChannel());
 
             // 连接缓存到内存
             clientMap.put(cmd.getId(), tcpClient);
@@ -51,7 +52,10 @@ public class NatProxyClientHandler extends SimpleChannelInboundHandler<ByteBuf> 
                     tcpClient.send(c.getData());
                 } catch (Exception e) {
                     // 异常,关闭连接,返回关闭信号
+                    log.info("[代理连接][关闭][{}]", tcpClient.getChannel());
+
                     tcpClient.stop();
+
                     clientMap.remove(c.getId());
                 }
             } else {
@@ -64,6 +68,8 @@ public class NatProxyClientHandler extends SimpleChannelInboundHandler<ByteBuf> 
             // 关闭信号,关闭真实连接
             NatTcpClient tcpClient = clientMap.get(cmd.getId());
             if (tcpClient != null) {
+                log.info("[代理连接][关闭][{}]", tcpClient.getChannel());
+
                 tcpClient.stop();
 
                 clientMap.remove(cmd.getId());
@@ -75,6 +81,8 @@ public class NatProxyClientHandler extends SimpleChannelInboundHandler<ByteBuf> 
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         for (NatTcpClient tcpClient : clientMap.values()) {
             try {
+                log.info("[代理连接][关闭][{}]", tcpClient.getChannel());
+
                 tcpClient.stop();
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
@@ -90,6 +98,8 @@ public class NatProxyClientHandler extends SimpleChannelInboundHandler<ByteBuf> 
             IdleStateEvent e = (IdleStateEvent) evt;
 
             if (e.state() == IdleState.READER_IDLE) {
+                log.info("[读超时][{}]", ctx.channel());
+
                 ctx.close();
             } else if (e.state() == IdleState.WRITER_IDLE) {
                 ctx.writeAndFlush(Codec.encode(ctx, new CmdHeartbeat()));

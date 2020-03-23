@@ -52,6 +52,8 @@ public class ShareGroup {
     public <T extends AbstractCmd> void sendToInnerNat(T cmd) {
         if (natProxyServerContext != null) {
             natProxyServerContext.writeAndFlush(Codec.encode(natProxyServerContext, cmd));
+        } else {
+            throw new RuntimeException("代理连接无客户端.");
         }
     }
 

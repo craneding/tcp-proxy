@@ -40,8 +40,12 @@ public class NatProxyServerHandler extends SimpleChannelInboundHandler<ByteBuf> 
         if (val == 1) {
             super.channelActive(ctx);
 
+            log.info("[激活连接][新连接][{}]", ctx.channel());
+
             shareGroup.setNatProxyServerContext(ctx);
         } else {
+            log.info("[拒绝连接][连接数过多][{}]", ctx.channel());
+
             ctx.close();
         }
     }
@@ -57,6 +61,8 @@ public class NatProxyServerHandler extends SimpleChannelInboundHandler<ByteBuf> 
 
             shareGroup.closeClients();
         }
+
+        log.info("[连接销毁][新连接][{}]", ctx.channel());
     }
 
     @Override
@@ -78,6 +84,8 @@ public class NatProxyServerHandler extends SimpleChannelInboundHandler<ByteBuf> 
             IdleStateEvent e = (IdleStateEvent) evt;
 
             if (e.state() == IdleState.READER_IDLE) {
+                log.warn("[读超时][关闭连接][{}]", ctx.channel());
+
                 ctx.close();
             }
         }

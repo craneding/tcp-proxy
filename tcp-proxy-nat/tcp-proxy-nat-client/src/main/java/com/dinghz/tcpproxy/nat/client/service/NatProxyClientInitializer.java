@@ -22,7 +22,7 @@ public class NatProxyClientInitializer extends ChannelInitializer<SocketChannel>
     protected void initChannel(SocketChannel ch) throws Exception {
         ChannelPipeline p = ch.pipeline();
 
-        p.addLast(new IdleStateHandler(60, 25, 0, TimeUnit.SECONDS));
+        p.addLast(new IdleStateHandler(45, 20, 0, TimeUnit.SECONDS));
         p.addLast(new CmdDecoder());
         p.addLast(new NatProxyClientHandler());
     }

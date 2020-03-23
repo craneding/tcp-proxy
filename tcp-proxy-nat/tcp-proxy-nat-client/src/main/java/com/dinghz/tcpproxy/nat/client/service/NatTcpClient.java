@@ -60,6 +60,7 @@ public class NatTcpClient implements ChannelFutureListener {
         if (!channel.isOpen()) {
             throw new ConnectException("connect " + host + " " + port + " error");
         }
+        log.info("[连接成功][{}]", channel);
     }
 
     public void asyncConnect() {
@@ -88,15 +89,19 @@ public class NatTcpClient implements ChannelFutureListener {
 
     @PreDestroy
     public void stop() {
-        if (channel != null) {
-            channel.attr(AttributeKey.valueOf("NoReConnect")).set(true);
-            channel.close();
-            channel = null;
-        }
+        disconnect();
 
         if (workerGroup != null) {
             workerGroup.shutdownGracefully();
             workerGroup = null;
+        }
+    }
+
+    public void disconnect() {
+        if (channel != null) {
+            channel.attr(AttributeKey.valueOf("NoReConnect")).set(true);
+            channel.close();
+            channel = null;
         }
     }
 
@@ -112,5 +117,9 @@ public class NatTcpClient implements ChannelFutureListener {
 
             channel = future.channel();
         }
+    }
+
+    public Channel getChannel() {
+        return channel;
     }
 }
