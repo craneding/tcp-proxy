@@ -26,13 +26,6 @@
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>tmp</groupId>
-            <artifactId>tmp</artifactId>
-            <systemPath>${basedir}/lib/intranet-penetration-1.0.0-jar-with-dependencies.jar</systemPath>
-            <scope>system</scope>
-        </dependency>
     </dependencies>
 
 </project>
