@@ -10,6 +10,7 @@
         <module>tcp-proxy-http</module>
         <module>tcp-proxy-core</module>
         <module>tcp-proxy-cert</module>
+        <module>tcp-proxy-nat</module>
     </modules>
     <name>tcp-proxy Maven Webapp</name>
     <url>http://maven.apache.org</url>
@@ -71,6 +72,12 @@
                 <groupId>org.xerial</groupId>
                 <artifactId>sqlite-jdbc</artifactId>
                 <version>3.25.2</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>1.2.66</version>
             </dependency>
 
             <dependency>
