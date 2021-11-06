@@ -9,6 +9,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.util.AttributeKey;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -28,9 +29,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Slf4j
 public class TcpServerHandler extends SimpleChannelInboundHandler<Object> {
     private final TcpConfig tcpConfig;
+    private final RestTemplate restTemplate;
 
-    public TcpServerHandler(TcpConfig tcpConfig) {
+    public TcpServerHandler(TcpConfig tcpConfig, RestTemplate restTemplate) {
         this.tcpConfig = tcpConfig;
+        this.restTemplate = restTemplate;
     }
 
     @Override
@@ -67,7 +70,7 @@ public class TcpServerHandler extends SimpleChannelInboundHandler<Object> {
                     .getRemoteHost() + ", remotePort:" + tcpConfig.getRemotePort() + ")");
         }
 
-        if (HttpProxy.sendRegister(tcpConfig, jdbcid, ip, username, passwd)) {
+        if (HttpProxy.sendRegister(restTemplate, tcpConfig, jdbcid, ip, username, passwd)) {
             ctx.channel().attr(AttributeKey.valueOf("register")).set(true);
 
             log.info("认证成功 {} {}", jdbcid, username);
@@ -95,7 +98,13 @@ public class TcpServerHandler extends SimpleChannelInboundHandler<Object> {
         new Thread(() -> {
             try {
                 do {
-                    byte[] data = HttpProxy.tcpRead(tcpConfig, jdbcid, username);
+                    byte[] data = HttpProxy.tcpRead(restTemplate, tcpConfig, jdbcid, username);
+
+                    if(data == null) {
+                        ctx.close();
+
+                        break;
+                    }
 
                     if (data.length > 0) {
                         ctx.channel().writeAndFlush(Unpooled.wrappedBuffer(data));
@@ -124,7 +133,7 @@ public class TcpServerHandler extends SimpleChannelInboundHandler<Object> {
         byte[] value = new byte[byteBuf.readableBytes()];
         byteBuf.readBytes(value);
 
-        HttpProxy.tcpWrite(tcpConfig, jdbcid, username, value);
+        HttpProxy.tcpWrite(restTemplate, tcpConfig, jdbcid, username, value);
     }
 
     @Override
@@ -158,7 +167,7 @@ public class TcpServerHandler extends SimpleChannelInboundHandler<Object> {
         if (register != null && register) {
             ctx.channel().attr(AttributeKey.<Boolean>valueOf("register")).set(null);
 
-            HttpProxy.sendUnRegister(tcpConfig, jdbcid);
+            HttpProxy.sendUnRegister(restTemplate, tcpConfig, jdbcid);
         }
     }
 

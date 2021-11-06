@@ -11,6 +11,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * TcpServer
@@ -24,12 +25,14 @@ import lombok.extern.slf4j.Slf4j;
 public class TcpServer {
 
     private final TcpConfig tcpConfig;
+    private final RestTemplate restTemplate;
 
     private EventLoopGroup bossGroup = new NioEventLoopGroup();
     private EventLoopGroup workerGroup = new NioEventLoopGroup();
 
-    public TcpServer(TcpConfig tcpConfig) {
+    public TcpServer(TcpConfig tcpConfig, RestTemplate restTemplate) {
         this.tcpConfig = tcpConfig;
+        this.restTemplate = restTemplate;
     }
 
     public boolean start() {
@@ -39,7 +42,7 @@ public class TcpServer {
                 .channel(NioServerSocketChannel.class)
                 .handler(new LoggingHandler(LogLevel.INFO))
                 .childOption(ChannelOption.SO_KEEPALIVE, true)
-                .childHandler(new TcpServerInitializer(tcpConfig));
+                .childHandler(new TcpServerInitializer(tcpConfig, restTemplate));
 
         try {
             Channel ch = b.bind(tcpConfig.getLocalPort()).sync().channel();

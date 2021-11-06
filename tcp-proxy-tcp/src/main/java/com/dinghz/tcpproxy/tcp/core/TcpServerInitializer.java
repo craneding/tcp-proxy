@@ -4,6 +4,7 @@ import com.dinghz.tcpproxy.tcp.domain.TcpConfig;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * TcpServerInitializer
@@ -16,16 +17,18 @@ import io.netty.channel.socket.SocketChannel;
 public class TcpServerInitializer extends ChannelInitializer<SocketChannel> {
 
     private final TcpConfig tcpConfig;
+    private final RestTemplate restTemplate;
 
-    public TcpServerInitializer(TcpConfig tcpConfig) {
+    public TcpServerInitializer(TcpConfig tcpConfig, RestTemplate restTemplate) {
         this.tcpConfig = tcpConfig;
+        this.restTemplate = restTemplate;
     }
 
     @Override
     protected void initChannel(SocketChannel ch) {
         ChannelPipeline p = ch.pipeline();
 
-        p.addLast(new TcpServerHandler(tcpConfig));
+        p.addLast(new TcpServerHandler(tcpConfig, restTemplate));
     }
 
 }

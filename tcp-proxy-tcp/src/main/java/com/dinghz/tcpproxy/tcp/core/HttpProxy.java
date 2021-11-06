@@ -1,15 +1,17 @@
 package com.dinghz.tcpproxy.tcp.core;
 
-import com.dinghz.tcpproxy.Util;
+import com.dinghz.tcpproxy.domain.*;
 import com.dinghz.tcpproxy.tcp.domain.TcpConfig;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -23,45 +25,74 @@ import java.util.Set;
  */
 @Slf4j
 public class HttpProxy {
-    public static byte[] tcpRead(TcpConfig tcpConfig, String jdbcid, String username) throws IOException {
+
+    public static byte[] tcpRead(RestTemplate restTemplate, TcpConfig tcpConfig, String jdbcid, String username) throws IOException {
         String spec = tcpConfig.getBaseUrl() + "/TcpRead";
 
-        Map<String, String> parms = new LinkedHashMap<>();
-        parms.put("tcpid", jdbcid);
+        ReadRequest readRequest = new ReadRequest();
+        readRequest.setTcpId(jdbcid);
 
-        byte[] bs = postAndGetData(spec, parms);
+        try {
+            ReadResponse response = restTemplate.postForObject(spec, readRequest, ReadResponse.class);
 
-        if (bs.length > 0) {
-            //logger.info("<<" + Hex.encodeHexString(bs));
-            log.info(username + " << " + tcpConfig.getRemoteHost() + ":" + tcpConfig.getRemotePort() + " " + bs.length + "字节", true);
+            if (response != null) {
+                if (response.getBody() != null && response.getBody().length > 0) {
+                    //logger.info("<<" + Hex.encodeHexString(bs));
+                    log.info(username + " << " + tcpConfig.getRemoteHost() + ":" + tcpConfig.getRemotePort() + " " + response.getBody().length + "字节", true);
+                } else if (!"0".equals(response.getCode())) {
+                    return null;
+                }
+
+                return response.getBody();
+            }
+        } catch (Exception e1) {
+            log.info("url:" + spec + " error:" + e1.getMessage());
+
+            e1.printStackTrace();
+
+            return new byte[]{};
         }
 
-        return bs;
+        return new byte[]{};
     }
 
-    public static boolean tcpWrite(TcpConfig tcpConfig, String tcpid, String username, byte[] data) throws IOException {
+    public static boolean tcpWrite(RestTemplate restTemplate, TcpConfig tcpConfig, String tcpid, String username, byte[] data) throws IOException {
         String spec = tcpConfig.getBaseUrl() + "/TcpWrite";
+
+        WriteRequest writeRequest = new WriteRequest();
+        writeRequest.setTcpId(tcpid);
+        writeRequest.setBody(data);
 
         //logger.info(">>" + Hex.encodeHexString(data));
         log.info(username + " >> " + tcpConfig.getRemoteHost() + ":" + tcpConfig.getRemotePort() + " " + data.length + "字节", true);
 
-        return upload(spec, tcpid, data);
+        try {
+            WriteResponse response = restTemplate.postForObject(spec, writeRequest, WriteResponse.class);
+
+            return response != null && "0".equals(response.getCode());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
     }
 
-    public static boolean sendRegister(TcpConfig tcpConfig, String jdbcid, String ip, String username, String passwd) throws IOException {
+    public static boolean sendRegister(RestTemplate restTemplate, TcpConfig tcpConfig, String jdbcid, String ip, String username, String passwd) throws IOException {
         String spec = tcpConfig.getBaseUrl() + "/TcpRegister";
 
-        Map<String, String> parms = new LinkedHashMap<>();
-        parms.put("tcpid", jdbcid);
-        parms.put("tcphost", tcpConfig.getRemoteHost());
-        parms.put("tcpport", tcpConfig.getRemotePort() + "");
-        parms.put(Util.Parameters.tcpip.name(), ip);
-        parms.put(Util.Parameters.tcpuser.name(), username);
-        parms.put(Util.Parameters.tcppasswd.name(), passwd);
+        RegisterRequest registerRequest = new RegisterRequest();
+        registerRequest.setTcpId(jdbcid);
+        registerRequest.setTcpHost(tcpConfig.getRemoteHost());
+        registerRequest.setTcpPort(tcpConfig.getRemotePort());
+        registerRequest.setTcpIp(ip);
+        registerRequest.setTcpUser(username);
+        registerRequest.setTcpPasswd(passwd);
 
         try {
-            return post(spec, parms);
-        } catch (IOException e1) {
+            RegisterResponse response = restTemplate.postForObject(spec, registerRequest, RegisterResponse.class);
+
+            return response != null && "0".equals(response.getCode());
+        } catch (Exception e1) {
             log.info("url:" + spec + " error:" + e1.getMessage());
 
             e1.printStackTrace();
@@ -70,20 +101,20 @@ public class HttpProxy {
         }
     }
 
-    public static boolean sendUnRegister(TcpConfig tcpConfig, String jdbcid) {
+    public static boolean sendUnRegister(RestTemplate restTemplate, TcpConfig tcpConfig, String jdbcid) {
         String spec = tcpConfig.getBaseUrl() + "/TcpUnRegister";
-        Map<String, String> parms = new LinkedHashMap<>();
-        parms.put("tcpid", jdbcid);
+
+        UnRegisterRequest unRegisterRequest = new UnRegisterRequest();
+        unRegisterRequest.setTcpId(jdbcid);
 
         try {
-            return post(spec, parms);
-        } catch (IOException e1) {
-            log.info("url:" + spec + " error:" + e1.getMessage());
+            UnRegisterResponse response = restTemplate.postForObject(spec, unRegisterRequest, UnRegisterResponse.class);
+            return response != null && "0".equals(response.getCode());
+        } catch (Exception e) {
+            e.printStackTrace();
 
-            e1.printStackTrace();
+            return false;
         }
-
-        return false;
     }
 
     static boolean post(String spec, Map<String, String> parms) throws IOException {
@@ -132,7 +163,8 @@ public class HttpProxy {
     }
 
     static byte[] postAndGetData(String spec, Map<String, String> parms) throws IOException {
-        StringBuilder builder = toPostDataBuilder(parms);
+        ObjectMapper mapper = new ObjectMapper();
+        String json = mapper.writeValueAsString(parms);
 
         HttpURLConnection conn = null;
         OutputStream out = null;
@@ -146,14 +178,20 @@ public class HttpProxy {
             conn.setDoInput(true);
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Accept-Charset", "utf-8");
-            conn.setRequestProperty("contentType", "utf-8");
+            conn.setRequestProperty("Content-Type", "application/json; utf-8");
+            conn.setRequestProperty("Accept", "application/json");
             conn.connect();
 
+            /*
             if (builder.length() > 0) {
                 out = new BufferedOutputStream(conn.getOutputStream());
                 out.write(builder.toString().getBytes("utf-8"));
                 out.flush();
             }
+             */
+
+            out.write(json.getBytes(StandardCharsets.UTF_8));
+            out.flush();
 
             int responseCode = conn.getResponseCode();
 

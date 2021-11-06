@@ -7,6 +7,7 @@ import com.dinghz.tcpproxy.tcp.repository.TcpConfigRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -27,11 +28,14 @@ public class TcpConfigService {
     @Autowired
     private TcpConfigRepository configRepository;
 
+    @Autowired
+    private RestTemplate restTemplate;
+
     @PostConstruct
     public void init() {
         CompletableFuture.runAsync(() -> {
             for (TcpConfig tcpConfig : configRepository.findAll()) {
-                TcpServer tcpServer = new TcpServer(tcpConfig);
+                TcpServer tcpServer = new TcpServer(tcpConfig, restTemplate);
                 tcpServer.start();
 
                 Cache.SERVER_MAP.put(tcpConfig.getId(), tcpServer);
@@ -51,7 +55,7 @@ public class TcpConfigService {
             }
         }
 
-        final TcpServer tcpServer = new TcpServer(tcpConfig);
+        final TcpServer tcpServer = new TcpServer(tcpConfig, restTemplate);
 
         if (!tcpServer.start()) {
             Cache.SERVER_MAP.put(tcpConfig.getId(), tcpServer);

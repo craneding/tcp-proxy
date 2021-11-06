@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.web.client.RestTemplate;
 import org.sqlite.SQLiteDataSource;
 
 import javax.sql.DataSource;
@@ -50,6 +51,19 @@ public class TcpApplication {
                 .packages("com.dinghz.tcpproxy.tcp.domain")
                 .persistenceUnit("local")
                 .build();
+    }
+
+    @Bean
+    public RestTemplate restTemplate() {
+        /*
+        HttpComponentsClientHttpRequestFactory httpRequestFactory = new HttpComponentsClientHttpRequestFactory();
+        httpRequestFactory.setConnectionRequestTimeout(10000);
+        httpRequestFactory.setConnectTimeout(10000);
+        httpRequestFactory.setReadTimeout(15000);
+
+        return new RestTemplate(httpRequestFactory);
+         */
+        return new RestTemplate();
     }
 
     public static void main(String[] args) {
