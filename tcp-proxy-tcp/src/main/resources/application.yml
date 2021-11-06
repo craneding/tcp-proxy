@@ -5,4 +5,4 @@ spring:
     database-platform: com.dinghz.tcpproxy.tcp.core.sqlite.SQLiteDialect
     generate-ddl: true
 server:
-  port: 8081
+  port: 9898
